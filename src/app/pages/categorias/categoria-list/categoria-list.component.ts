@@ -12,4 +12,8 @@ export class CategoriaListComponent implements OnInit {
   ngOnInit() {
   }
 
+  alert(excluir: string) {
+    
+  }
+
 }
