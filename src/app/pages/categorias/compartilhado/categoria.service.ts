@@ -11,26 +11,22 @@ import { catchError, map } from 'rxjs/operators';
 })
 export class CategoriaService {
 
-  private PATH: string = "api/categoria";
+  private PATH: string = "categoria";
 
   constructor(
     private http: HttpClient,
     private httpUtil: HttpUtilService) { }
 
   getAll(): Observable<Categoria[]>{
-    return this.http.get(this.PATH).pipe(
+    return this.http.get(env.baseApiUrl + this.PATH).pipe(
       catchError(this.handleError),
       map(this.jsonDataToCategorias)
     );
-    /*return this.http.get(env.baseApiUrl + this.PATH).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToCategorias)
-    );*/
   }
 
   getById(id: number): Observable<Categoria> {
-    const url = `${this.PATH}/${id}`;
-    //const url = `${env.baseApiUrl+this.PATH}/${id}`;
+    //const url = `${this.PATH}/${id}`;
+    const url = `${env.baseApiUrl+this.PATH}/${id}`;
     return this.http.get(url).pipe(
       catchError(this.handleError),
       map(this.jsonDataToCategoria)
@@ -38,14 +34,14 @@ export class CategoriaService {
   }
 
   salvar(categoria: Categoria): Observable<Categoria> {
-    return this.http.post(this.PATH, categoria).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToCategoria)
-    );
-    /*return this.http.post(env.baseApiUrl + this.PATH, categoria).pipe(
+    /*return this.http.post(this.PATH, categoria).pipe(
       catchError(this.handleError),
       map(this.jsonDataToCategoria)
     );*/
+    return this.http.post(env.baseApiUrl + this.PATH, categoria).pipe(
+      catchError(this.handleError),
+      map(this.jsonDataToCategoria)
+    );
   }
 
   atualizar(categoria: Categoria): Observable<Categoria> {
@@ -71,6 +67,7 @@ export class CategoriaService {
   }
 
   private jsonDataToCategorias(jsonData: any[]): Categoria[] {
+    console.log('Json data: '+JSON.stringify(jsonData));
     const categorias: Categoria[] = [];
     jsonData.forEach(element => categorias.push(element as Categoria));
     return categorias;
@@ -81,7 +78,17 @@ export class CategoriaService {
   }
 
   private handleError(error: any): Observable<any> {
+    console.log('error: '+JSON.stringify(error));
     console.log("Erro na requisição => ", error);
     return throwError(error);
+  }
+
+  removerElementoLista(categorias: Categoria[], categoria: Categoria): Categoria[] {
+    const categoriasNew: Categoria[] = [];
+    categorias.forEach(element => {
+      if(element.id != categoria.id)
+        categoriasNew.push(element)
+    });
+    return categoriasNew;
   }
 }
